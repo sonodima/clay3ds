@@ -1,0 +1,5 @@
+# Compilation Outputs
+[Bb]uild/
+
+# macOS Desktop
+.DS_Store
