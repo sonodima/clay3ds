@@ -5,7 +5,7 @@
 # For the full copyright and license information, please view the LICENSE
 # file that was distributed with this source code.
 
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.14)
 
 project(clay3ds
   VERSION 1.0.0 
@@ -20,7 +20,7 @@ project(clay3ds
 option(CLAY3DS_BUILD_EXAMPLES "Build Examples" OFF)
 
 # ================================
-# Installation
+# Configuration & Installation
 # ================================
 
 include(CMakePackageConfigHelpers)
@@ -28,6 +28,7 @@ include(GNUInstallDirs)
 
 add_library(clay3ds INTERFACE)
 add_library(clay3ds::clay3ds ALIAS clay3ds)
+target_compile_features(clay3ds INTERFACE c_std_99)
 target_include_directories(clay3ds
 INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

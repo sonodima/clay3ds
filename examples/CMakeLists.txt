@@ -5,7 +5,7 @@
 # For the full copyright and license information, please view the LICENSE
 # file that was distributed with this source code.
 
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.14)
 
 project(clay3dse
   DESCRIPTION "Examples for the Clay3DS project"
@@ -30,14 +30,15 @@ endif()
 # ================================
 
 function(add_sample FILE)
-  add_executable("clay3dse_${FILE}")
-  target_sources("clay3dse_${FILE}" PRIVATE "${FILE}.c")
-  target_include_directories("clay3dse_${FILE}" PRIVATE "${clay_SOURCE_DIR}")
-  target_link_libraries("clay3dse_${FILE}" PRIVATE citro2d citro3d clay3ds)
+  add_executable(clay3dse_${FILE})
+  target_sources(clay3dse_${FILE} PRIVATE "${FILE}.c")
+  target_compile_features(clay3dse_${FILE} INTERFACE c_std_99)
+  target_include_directories(clay3dse_${FILE} PRIVATE "${clay_SOURCE_DIR}")
+  target_link_libraries(clay3dse_${FILE} PRIVATE citro2d citro3d clay3ds)
 
-  set_target_properties("clay3dse_${FILE}" PROPERTIES OUTPUT_NAME "${FILE}")
+  set_target_properties(clay3dse_${FILE} PROPERTIES OUTPUT_NAME "${FILE}")
   ctr_generate_smdh("${FILE}.smdh" NAME "Clay3DS Example")
-  ctr_create_3dsx("clay3dse_${FILE}" SMDH "${FILE}.smdh")
+  ctr_create_3dsx(clay3dse_${FILE} SMDH "${FILE}.smdh")
 endfunction()
 
 add_sample(minimal)
