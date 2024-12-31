@@ -1,4 +1,4 @@
-// This file is part of the [clay_citro2d_renderer] project.
+// This file is part of the Clay3DS project.
 //
 // (c) 2024 Tommaso Dimatore
 //
@@ -15,7 +15,7 @@
 
 #define CLAY_IMPLEMENTATION
 #include <clay.h>
-#include <clay_citro2d_renderer.h>
+#include <clay3ds.h>
 
 // clang-format off
 #define DISPLAY_TRANSFER_FLAGS GX_TRANSFER_FLIP_VERT(0) \

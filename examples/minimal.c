@@ -1,4 +1,4 @@
-// This file is part of the [clay_citro2d_renderer] project.
+// This file is part of the Clay3DS project.
 //
 // (c) 2024 Tommaso Dimatore
 //
@@ -16,7 +16,7 @@
 
 #define CLAY_IMPLEMENTATION
 #include <clay.h>
-#include <clay_citro2d_renderer.h>
+#include <clay3ds.h>
 
 static bool isRounded = false;
 
@@ -98,7 +98,7 @@ int main(void)
   u64 previousTime = osGetTime();
 
   printf("want to learn more?\n");
-  printf("github.com/sonodima/clay_citro2d_renderer\n");
+  printf("github.com/sonodima/clay3ds\n");
 
   while (aptMainLoop())
   {

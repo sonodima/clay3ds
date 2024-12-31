@@ -1,6 +1,6 @@
-# Clay Citro2D Renderer
+# Clay3DS
 
-Clay Citro2D Renderer *(alias CC2D)* is a library that makes it easy to use the [Clay](https://github.com/nicbarker/clay) library on the Nintendo 3DS.
+Clay3DS is a library that makes it easy to use the [Clay](https://github.com/nicbarker/clay) library on the Nintendo 3DS.
 
 ## Feature Support
 

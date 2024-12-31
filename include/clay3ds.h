@@ -1,4 +1,4 @@
-// This file is part of the [clay_citro2d_renderer] project.
+// This file is part of the Clay3DS project.
 //
 // (c) 2024 Tommaso Dimatore
 //
