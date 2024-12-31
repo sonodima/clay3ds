@@ -15,7 +15,7 @@ Clay3DS is a library that makes it easy to use the [Clay](https://github.com/nic
 
 ## Installation
 
-CC2D is header only, so just include its header after including `clay.h` and you are good.
+Clay3DS is header only, so just include its header after including `clay.h` and you are good.
 
 You can also use CMake FetchContent if you feel fancy.
 
@@ -39,7 +39,7 @@ After you have set up your environment, you can use the following commands to bu
 
 ```sh
 # Configure the project using the devkitPro cmake wrapper:
-/opt/devkitpro/portlibs/3ds/bin/arm-none-eabi-cmake -S . -DCC2D_BUILD_EXAMPLES=true -B build
+/opt/devkitpro/portlibs/3ds/bin/arm-none-eabi-cmake -S . -DCLAY3DS_BUILD_EXAMPLES=true -B build
 
 # Compile the program in release mode:
 cmake -B build -C Release

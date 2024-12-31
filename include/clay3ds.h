@@ -5,8 +5,8 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-#ifndef __CC2D_RENDERER_H
-#define __CC2D_RENDERER_H
+#ifndef __CLAY3DS_H
+#define __CLAY3DS_H
 
 #include <math.h>
 #include <stdio.h>
@@ -19,22 +19,22 @@
 
 #include "clay.h"
 
-#define CC2Di__CLAY_COLOR_TO_C2D(cc) C2D_Color32((u8)cc.r, (u8)cc.g, (u8)cc.b, (u8)cc.a)
-#define CC2Di__DEG_TO_RAD(value) ((value) * (M_PI / 180.f))
-#define CC2Di__GET_TEXT_SCALE(fs) ((float)(fs) / 30.f)
+#define Clay3DSi__CLAY_COLOR_TO_C2D(cc) C2D_Color32((u8)cc.r, (u8)cc.g, (u8)cc.b, (u8)cc.a)
+#define Clay3DSi__DEG_TO_RAD(value) ((value) * (M_PI / 180.f))
+#define Clay3DSi__GET_TEXT_SCALE(fs) ((float)(fs) / 30.f)
 
-static void CC2Di__DrawArc(float cx, float cy, float radius, float angs, float ange, float thickness, u32 color)
+static void Clay3DSi__DrawArc(float cx, float cy, float radius, float angs, float ange, float thickness, u32 color)
 {
   u32 segments = 8;
   float step = (ange - angs) / segments;
 
-  float angle = CC2Di__DEG_TO_RAD(angs);
+  float angle = Clay3DSi__DEG_TO_RAD(angs);
   float x1 = cx + radius * cos(angle);
   float y1 = cy + radius * sin(angle);
 
   for (u32 i = 0; i <= segments; ++i)
   {
-    angle = CC2Di__DEG_TO_RAD(angs + i * step);
+    angle = Clay3DSi__DEG_TO_RAD(angs + i * step);
     float x2 = cx + radius * cos(angle);
     float y2 = cy + radius * sin(angle);
 
@@ -44,18 +44,18 @@ static void CC2Di__DrawArc(float cx, float cy, float radius, float angs, float a
   }
 }
 
-static void CC2Di__FillArc(float cx, float cy, float radius, float angs, float ange, u32 color)
+static void Clay3DSi__FillArc(float cx, float cy, float radius, float angs, float ange, u32 color)
 {
   u32 segments = 8;
   float step = (ange - angs) / segments;
 
-  float angle = CC2Di__DEG_TO_RAD(angs);
+  float angle = Clay3DSi__DEG_TO_RAD(angs);
   float x1 = cx + radius * cos(angle);
   float y1 = cy + radius * sin(angle);
 
   for (u32 i = 0; i <= segments; ++i)
   {
-    angle = CC2Di__DEG_TO_RAD(angs + i * step);
+    angle = Clay3DSi__DEG_TO_RAD(angs + i * step);
     float x2 = cx + radius * cos(angle);
     float y2 = cy + radius * sin(angle);
 
@@ -65,9 +65,9 @@ static void CC2Di__FillArc(float cx, float cy, float radius, float angs, float a
   }
 }
 
-static Clay_Dimensions CC2D_MeasureText(Clay_String* string, Clay_TextElementConfig* config)
+static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElementConfig* config)
 {
-  float scale = CC2Di__GET_TEXT_SCALE(config->fontSize);
+  float scale = Clay3DSi__GET_TEXT_SCALE(config->fontSize);
 
   // TODO: re-use the same buffer for performance.
   char* cloned = (char*)malloc(string->length + 1);
@@ -87,7 +87,7 @@ static Clay_Dimensions CC2D_MeasureText(Clay_String* string, Clay_TextElementCon
   return dimensions;
 }
 
-static void CC2D_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimensions, Clay_RenderCommandArray renderCommands)
+static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimensions, Clay_RenderCommandArray renderCommands)
 {
   for (u32 i = 0; i < renderCommands.length; i++)
   {
@@ -98,7 +98,7 @@ static void CC2D_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimensio
     {
     case CLAY_RENDER_COMMAND_TYPE_RECTANGLE: {
       Clay_RectangleElementConfig* config = renderCommand->config.rectangleElementConfig;
-      u32 color = CC2Di__CLAY_COLOR_TO_C2D(config->color);
+      u32 color = Clay3DSi__CLAY_COLOR_TO_C2D(config->color);
       float tlr = config->cornerRadius.topLeft;
       float trr = config->cornerRadius.topRight;
       float brr = config->cornerRadius.bottomRight;
@@ -145,20 +145,20 @@ static void CC2D_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimensio
         C2D_DrawTriangle(tx2, ry1, color, tx1, ly1, color, bx2, ry2, color, 0.f);
         C2D_DrawTriangle(bx1, ly2, color, tx1, ly1, color, bx2, ry2, color, 0.f);
 
-        CC2Di__FillArc(box.x + tlr, box.y + tlr, tlr, 180.f, 270.f, color);
-        CC2Di__FillArc(box.x + box.width - trr, box.y + trr, trr, 270.f, 360.f, color);
-        CC2Di__FillArc(box.x + blr, box.y + box.height - blr, blr, 90.f, 180.f, color);
-        CC2Di__FillArc(box.x + box.width - brr, box.y + box.height - brr, brr, 0.f, 90.f, color);
+        Clay3DSi__FillArc(box.x + tlr, box.y + tlr, tlr, 180.f, 270.f, color);
+        Clay3DSi__FillArc(box.x + box.width - trr, box.y + trr, trr, 270.f, 360.f, color);
+        Clay3DSi__FillArc(box.x + blr, box.y + box.height - blr, blr, 90.f, 180.f, color);
+        Clay3DSi__FillArc(box.x + box.width - brr, box.y + box.height - brr, brr, 0.f, 90.f, color);
       }
 
       break;
     }
     case CLAY_RENDER_COMMAND_TYPE_BORDER: {
       Clay_BorderElementConfig* config = renderCommand->config.borderElementConfig;
-      u32 tc = CC2Di__CLAY_COLOR_TO_C2D(config->top.color);
-      u32 lc = CC2Di__CLAY_COLOR_TO_C2D(config->left.color);
-      u32 rc = CC2Di__CLAY_COLOR_TO_C2D(config->right.color);
-      u32 bc = CC2Di__CLAY_COLOR_TO_C2D(config->bottom.color);
+      u32 tc = Clay3DSi__CLAY_COLOR_TO_C2D(config->top.color);
+      u32 lc = Clay3DSi__CLAY_COLOR_TO_C2D(config->left.color);
+      u32 rc = Clay3DSi__CLAY_COLOR_TO_C2D(config->right.color);
+      u32 bc = Clay3DSi__CLAY_COLOR_TO_C2D(config->bottom.color);
       float lw = config->left.width;
       float tw = config->top.width;
       float rw = config->right.width;
@@ -188,27 +188,27 @@ static void CC2D_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimensio
       }
       if (tlr > 0.f)
       {
-        CC2Di__DrawArc(box.x + tlr, box.y + tlr, tlr - tw / 2.f, 180.f, 270.f, tw, tc);
+        Clay3DSi__DrawArc(box.x + tlr, box.y + tlr, tlr - tw / 2.f, 180.f, 270.f, tw, tc);
       }
       if (trr > 0.f)
       {
-        CC2Di__DrawArc(box.x + box.width - trr, box.y + trr, trr - tw / 2.f, 270.f, 360.f, tw, tc);
+        Clay3DSi__DrawArc(box.x + box.width - trr, box.y + trr, trr - tw / 2.f, 270.f, 360.f, tw, tc);
       }
       if (blr > 0.f)
       {
-        CC2Di__DrawArc(box.x + blr, box.y + box.height - blr, blr - bw / 2.f, 90.f, 180.f, bw, bc);
+        Clay3DSi__DrawArc(box.x + blr, box.y + box.height - blr, blr - bw / 2.f, 90.f, 180.f, bw, bc);
       }
       if (brr > 0.f)
       {
-        CC2Di__DrawArc(box.x + box.width - brr, box.y + box.height - brr, brr - bw / 2.f, 0.f, 90.f, bw, bc);
+        Clay3DSi__DrawArc(box.x + box.width - brr, box.y + box.height - brr, brr - bw / 2.f, 0.f, 90.f, bw, bc);
       }
 
       break;
     }
     case CLAY_RENDER_COMMAND_TYPE_TEXT: {
       Clay_TextElementConfig* config = renderCommand->config.textElementConfig;
-      float scale = CC2Di__GET_TEXT_SCALE(config->fontSize);
-      u32 color = CC2Di__CLAY_COLOR_TO_C2D(config->textColor);
+      float scale = Clay3DSi__GET_TEXT_SCALE(config->fontSize);
+      u32 color = Clay3DSi__CLAY_COLOR_TO_C2D(config->textColor);
 
       Clay_String string = renderCommand->text;
       // TODO: re-use the same buffer for performance.
@@ -245,7 +245,7 @@ static void CC2D_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimensio
   }
 }
 
-static void CC2D_UpdateInput(float deltaTime)
+static void Clay3DS_UpdateInput(float deltaTime)
 {
   Clay_UpdateScrollContainers(true, (Clay_Vector2){0.f, 0.f}, deltaTime);
 
@@ -264,4 +264,4 @@ static void CC2D_UpdateInput(float deltaTime)
   }
 }
 
-#endif // __CC2D_RENDERER_H
+#endif // __CLAY3DS_H

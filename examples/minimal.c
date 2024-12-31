@@ -82,7 +82,7 @@ int main(void)
   Clay_SetMaxElementCount(1024);
   u64 clayMemSize = Clay_MinMemorySize();
   Clay_Arena clayArena = Clay_CreateArenaWithCapacityAndMemory(clayMemSize, malloc(clayMemSize));
-  Clay_SetMeasureTextFunction(CC2D_MeasureText);
+  Clay_SetMeasureTextFunction(Clay3DS_MeasureText);
   Clay_Dimensions dimensions = (Clay_Dimensions){320, 240};
   Clay_Initialize(clayArena, dimensions, (Clay_ErrorHandler){onClayError});
 
@@ -106,7 +106,7 @@ int main(void)
     float deltaTime = (currentTime - previousTime) / 1000.f;
     previousTime = currentTime;
 
-    CC2D_UpdateInput(deltaTime);
+    Clay3DS_UpdateInput(deltaTime);
 
     // ===========================
     // Rendering
@@ -116,7 +116,7 @@ int main(void)
     C2D_TargetClear(bottom, clearColor);
     C2D_SceneBegin(bottom);
 
-    CC2D_Render(bottom, dimensions, renderLayout());
+    Clay3DS_Render(bottom, dimensions, renderLayout());
 
     C3D_FrameEnd(0);
   }
