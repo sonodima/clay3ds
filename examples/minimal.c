@@ -36,10 +36,17 @@ Clay_RenderCommandArray renderLayout(void)
   CLAY(
     CLAY_LAYOUT({
       .sizing = {.width = CLAY_SIZING_GROW(), .height = CLAY_SIZING_GROW()},
-      .childAlignment = {.x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER}
+      .layoutDirection = CLAY_TOP_TO_BOTTOM,
+      .childAlignment = {.x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER},
+      .childGap = 8
     })
   ) {
+    // ============================
+    // Simple Button
+    // ============================
+  
     CLAY(
+      CLAY_ID("COOL_BUTTON"),
       Clay_OnHover(onButtonInteraction, 0),
       CLAY_RECTANGLE({
         .color = Clay_Hovered()
@@ -52,9 +59,7 @@ Clay_RenderCommandArray renderLayout(void)
         ((Clay_Color){152, 171, 205, 255}),
         isRounded ? FLT_MAX : 0.f
       ),
-      CLAY_LAYOUT({
-        .padding = {.x = 12, .y = 6}
-      })
+      CLAY_LAYOUT({.padding = {.x = 12, .y = 6}})
     ) {
       CLAY(
         CLAY_TEXT(
@@ -65,6 +70,28 @@ Clay_RenderCommandArray renderLayout(void)
           })
         )
       ) {}
+    }
+
+    // ============================
+    // Scrollable Color Palette Demo
+    // ============================
+
+    CLAY(
+      CLAY_ID("PALETTE_VIEW"),
+      CLAY_SCROLL({.horizontal = true}),
+      CLAY_LAYOUT({
+        .sizing = {.width = CLAY_SIZING_FIT(), .height = CLAY_SIZING_GROW()},
+      })
+    ) {
+      for (u32 i = 1; i <= 10; ++i)
+      {
+        CLAY(
+          CLAY_RECTANGLE({.color = (Clay_Color){i * 25, 0, 0, 255}}),
+          CLAY_LAYOUT({
+            .sizing = {.width = CLAY_SIZING_FIXED(80), .height = CLAY_SIZING_GROW()},
+          })
+        ) {}
+      }
     }
   }
 

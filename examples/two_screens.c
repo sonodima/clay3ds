@@ -53,6 +53,7 @@ Clay_RenderCommandArray topLayout(void)
     })
   ) {
     CLAY(
+      CLAY_ID("GEOMETRY_ROW"),
       CLAY_LAYOUT({
         .childAlignment = {.x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER},
         .childGap = 20
@@ -117,6 +118,7 @@ Clay_RenderCommandArray bottomLayout(void)
     })
   ) {
     CLAY(
+      CLAY_ID("EXIT_BUTTON"),
       Clay_OnHover(onButtonInteraction, 0),
       CLAY_RECTANGLE({
         .color = Clay_Hovered()
