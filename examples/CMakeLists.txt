@@ -5,18 +5,9 @@
 # For the full copyright and license information, please view the LICENSE
 # file that was distributed with this source code.
 
-cmake_minimum_required(VERSION 3.14)
-include(FetchContent)
+cmake_minimum_required(VERSION 3.21)
 
-FetchContent_Declare(Clay
-  GIT_REPOSITORY https://github.com/nicbarker/clay.git
-  GIT_TAG        main)
-FetchContent_GetProperties(Clay)
-if(NOT clay_POPULATED)
-  FetchContent_Populate(Clay)
-endif()
-
-project(CC2DE)
+project(CC2DE LANGUAGES C)
 
 function(add_sample NAME)
   add_executable(CC2DE_${NAME})
