@@ -106,11 +106,29 @@ int main(void)
     float deltaTime = (currentTime - previousTime) / 1000.f;
     previousTime = currentTime;
 
-    Clay3DS_UpdateInput(deltaTime);
+    // ============================
+    // Update Input
+    // ============================
 
-    // ===========================
+    Clay_UpdateScrollContainers(true, (Clay_Vector2){0.f, 0.f}, deltaTime);
+
+    hidScanInput();
+    bool isTouching = hidKeysHeld() & KEY_TOUCH;
+    touchPosition touch;
+    hidTouchRead(&touch);
+
+    if (isTouching)
+    {
+      Clay_SetPointerState((Clay_Vector2){touch.px, touch.py}, true);
+    }
+    else
+    {
+      Clay_SetPointerState((Clay_Vector2){-1, -1}, false);
+    }
+
+    // ============================
     // Rendering
-    // ===========================
+    // ============================
 
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     C2D_TargetClear(bottom, clearColor);

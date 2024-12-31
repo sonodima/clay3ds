@@ -245,23 +245,4 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
   }
 }
 
-static void Clay3DS_UpdateInput(float deltaTime)
-{
-  Clay_UpdateScrollContainers(true, (Clay_Vector2){0.f, 0.f}, deltaTime);
-
-  hidScanInput();
-  bool isTouching = hidKeysHeld() & KEY_TOUCH;
-  touchPosition touch;
-  hidTouchRead(&touch);
-
-  if (isTouching)
-  {
-    Clay_SetPointerState((Clay_Vector2){touch.px, touch.py}, true);
-  }
-  else
-  {
-    Clay_SetPointerState((Clay_Vector2){-1, -1}, false);
-  }
-}
-
 #endif // __CLAY3DS_H
