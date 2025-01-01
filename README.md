@@ -11,7 +11,7 @@ Clay3DS is a library that makes it easy to use the [Clay](https://github.com/nic
 - [x] **Dual Screens** • Supported, as long as you don't put interactable items on the top screen *(which would not make sense anyway)*
 - [x] **Touch Screen** • Implemented and working correctly *(including drag scroll)*
 - [x] **Transparency** • Implemented and working correctly
-- [ ] **Images** • Not implemented _(yet)_
+- [x] **Images** • Implemented _(but untested)_
 
 ## Installation
 

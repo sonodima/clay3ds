@@ -32,8 +32,8 @@ static void Clay3DSi__FillQuad(float x1, float y1, float x2, float y2, float x3,
 static void Clay3DSi__DrawArc(float cx, float cy, float radius, float angs, float ange, float thickness, u32 color)
 {
   u32 segments = 4;
-  float ir = radius - thickness / 2.f;
-  float or = radius + thickness / 2.f;
+  float innerRadius = radius - thickness / 2.f;
+  float outerRadius = radius + thickness / 2.f;
 
   float step = Clay3DSi__DEG_TO_RAD((ange - angs) / segments);
   float cosStep = cos(step);
@@ -43,19 +43,19 @@ static void Clay3DSi__DrawArc(float cx, float cy, float radius, float angs, floa
   float cosAngle1 = cos(angle);
   float sinAngle1 = sin(angle);
 
-  float xInner1 = cx + ir * cosAngle1;
-  float yInner1 = cy + ir * sinAngle1;
-  float xOuter1 = cx + or * cosAngle1;
-  float yOuter1 = cy + or * sinAngle1;
+  float xInner1 = cx + innerRadius * cosAngle1;
+  float yInner1 = cy + innerRadius * sinAngle1;
+  float xOuter1 = cx + outerRadius *cosAngle1;
+  float yOuter1 = cy + outerRadius *sinAngle1;
 
   for (u32 i = 1; i <= segments; ++i)
   {
     float cosAngle2 = cosAngle1 * cosStep - sinAngle1 * sinStep;
     float sinAngle2 = sinAngle1 * cosStep + cosAngle1 * sinStep;
-    float xInner2 = cx + ir * cosAngle2;
-    float yInner2 = cy + ir * sinAngle2;
-    float xOuter2 = cx + or * cosAngle2;
-    float yOuter2 = cy + or * sinAngle2;
+    float xInner2 = cx + innerRadius * cosAngle2;
+    float yInner2 = cy + innerRadius * sinAngle2;
+    float xOuter2 = cx + outerRadius *cosAngle2;
+    float yOuter2 = cy + outerRadius *sinAngle2;
 
     Clay3DSi__FillQuad(xInner1, yInner1, xInner2, yInner2, xOuter2, yOuter2, xOuter1, yOuter1, color);
 
@@ -260,6 +260,16 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
 
       C2D_TextBufDelete(buffer);
       free(cloned);
+      break;
+    }
+    case CLAY_RENDER_COMMAND_TYPE_IMAGE: {
+      Clay_ImageElementConfig* config = renderCommand->config.imageElementConfig;
+      C2D_DrawParams params = {{box.x, box.y, box.width, box.height}, {0.f, 0.f}, 0.f, 0.f};
+
+      if (config->imageData != NULL)
+      {
+        C2D_DrawImage(*(C2D_Image*)config->imageData, &params, NULL);
+      }
       break;
     }
     case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START: {
