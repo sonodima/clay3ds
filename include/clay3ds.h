@@ -23,43 +23,77 @@
 #define Clay3DSi__DEG_TO_RAD(value) ((value) * (M_PI / 180.f))
 #define Clay3DSi__GET_TEXT_SCALE(fs) ((float)(fs) / 30.f)
 
+static void Clay3DSi__FillQuad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, u32 color)
+{
+  C2D_DrawTriangle(x1, y1, color, x2, y2, color, x3, y3, color, 0.f);
+  C2D_DrawTriangle(x1, y1, color, x3, y3, color, x4, y4, color, 0.f);
+}
+
 static void Clay3DSi__DrawArc(float cx, float cy, float radius, float angs, float ange, float thickness, u32 color)
 {
-  u32 segments = 8;
-  float step = (ange - angs) / segments;
+  u32 segments = 4;
+  float ir = radius - thickness / 2.f;
+  float or = radius + thickness / 2.f;
+
+  float step = Clay3DSi__DEG_TO_RAD((ange - angs) / segments);
+  float cosStep = cos(step);
+  float sinStep = sin(step);
 
   float angle = Clay3DSi__DEG_TO_RAD(angs);
-  float x1 = cx + radius * cos(angle);
-  float y1 = cy + radius * sin(angle);
+  float cosAngle1 = cos(angle);
+  float sinAngle1 = sin(angle);
 
-  for (u32 i = 0; i <= segments; ++i)
+  float xInner1 = cx + ir * cosAngle1;
+  float yInner1 = cy + ir * sinAngle1;
+  float xOuter1 = cx + or * cosAngle1;
+  float yOuter1 = cy + or * sinAngle1;
+
+  for (u32 i = 1; i <= segments; ++i)
   {
-    angle = Clay3DSi__DEG_TO_RAD(angs + i * step);
-    float x2 = cx + radius * cos(angle);
-    float y2 = cy + radius * sin(angle);
+    float cosAngle2 = cosAngle1 * cosStep - sinAngle1 * sinStep;
+    float sinAngle2 = sinAngle1 * cosStep + cosAngle1 * sinStep;
+    float xInner2 = cx + ir * cosAngle2;
+    float yInner2 = cy + ir * sinAngle2;
+    float xOuter2 = cx + or * cosAngle2;
+    float yOuter2 = cy + or * sinAngle2;
 
-    C2D_DrawLine(x1, y1, color, x2, y2, color, thickness, 0.f);
-    x1 = x2;
-    y1 = y2;
+    Clay3DSi__FillQuad(xInner1, yInner1, xInner2, yInner2, xOuter2, yOuter2, xOuter1, yOuter1, color);
+
+    cosAngle1 = cosAngle2;
+    sinAngle1 = sinAngle2;
+    xInner1 = xInner2;
+    yInner1 = yInner2;
+    xOuter1 = xOuter2;
+    yOuter1 = yOuter2;
   }
 }
 
 static void Clay3DSi__FillArc(float cx, float cy, float radius, float angs, float ange, u32 color)
 {
-  u32 segments = 8;
-  float step = (ange - angs) / segments;
+  u32 segments = 4;
+
+  float step = Clay3DSi__DEG_TO_RAD((ange - angs) / segments);
+  float cosStep = cos(step);
+  float sinStep = sin(step);
 
   float angle = Clay3DSi__DEG_TO_RAD(angs);
-  float x1 = cx + radius * cos(angle);
-  float y1 = cy + radius * sin(angle);
+  float cosAngle1 = cos(angle);
+  float sinAngle1 = sin(angle);
 
-  for (u32 i = 0; i <= segments; ++i)
+  float x1 = cx + radius * cosAngle1;
+  float y1 = cy + radius * sinAngle1;
+
+  for (u32 i = 1; i <= segments; ++i)
   {
-    angle = Clay3DSi__DEG_TO_RAD(angs + i * step);
-    float x2 = cx + radius * cos(angle);
-    float y2 = cy + radius * sin(angle);
+    float cosAngle2 = cosAngle1 * cosStep - sinAngle1 * sinStep;
+    float sinAngle2 = sinAngle1 * cosStep + cosAngle1 * sinStep;
+    float x2 = cx + radius * cosAngle2;
+    float y2 = cy + radius * sinAngle2;
 
     C2D_DrawTriangle(cx, cy, color, x1, y1, color, x2, y2, color, 0.f);
+
+    cosAngle1 = cosAngle2;
+    sinAngle1 = sinAngle2;
     x1 = x2;
     y1 = y2;
   }
@@ -118,37 +152,38 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
         brr = fminf(brr, max);
         blr = fminf(blr, max);
 
-        // Holy Moly!
-        // This is cryptic as fuck but it works.
-        float lx = box.x;
-        float ly1 = box.y + tlr;
-        float ly2 = box.y + box.height - blr;
-        float ty = box.y;
-        float tx1 = box.x + tlr;
-        float tx2 = box.x + box.width - trr;
-        float rx = box.x + box.width;
-        float ry1 = box.y + trr;
-        float ry2 = box.y + box.height - brr;
-        float by = box.y + box.height;
-        float bx1 = box.x + blr;
-        float bx2 = box.x + box.width - brr;
+        // clang-format off
+        Clay3DSi__FillQuad(box.x + tlr, box.y,
+                           box.x + box.width - trr, box.y,
+                           box.x + box.width - trr, box.y + trr,
+                           box.x + tlr, box.y + tlr,
+                           color); // Top
+        Clay3DSi__FillQuad(box.x + box.width - trr, box.y + trr,
+                           box.x + box.width, box.y + trr,
+                           box.x + box.width, box.y + box.height - brr,
+                           box.x + box.width - brr, box.y + box.height - brr,
+                           color); // Right
+        Clay3DSi__FillQuad(box.x + blr, box.y + box.height - blr,
+                           box.x + box.width - brr, box.y + box.height - brr,
+                           box.x + box.width - brr, box.y + box.height,
+                           box.x + blr, box.y + box.height,
+                           color); // Bottom
+        Clay3DSi__FillQuad(box.x, box.y + tlr,
+                           box.x + tlr, box.y + tlr,
+                           box.x + blr, box.y + box.height - blr,
+                           box.x, box.y + box.height - blr,
+                           color); // Left
+        Clay3DSi__FillQuad(box.x + tlr, box.y + tlr,
+                           box.x + box.width - trr, box.y + trr,
+                           box.x + box.width - brr, box.y + box.height - brr,
+                           box.x + blr, box.y + box.height - blr,
+                           color); // Inner
+        // clang-format on
 
-        C2D_DrawTriangle(lx, ly1, color, box.x + tlr, ly1, color, lx, ly2, color, 0.f);
-        C2D_DrawTriangle(box.x + blr, ly2, color, box.x + tlr, ly1, color, lx, ly2, color, 0.f);
-        C2D_DrawTriangle(tx1, ty, color, tx1, box.y + tlr, color, tx2, ty, color, 0.f);
-        C2D_DrawTriangle(tx2, box.y + trr, color, tx1, box.y + tlr, color, tx2, ty, color, 0.f);
-        C2D_DrawTriangle(rx, ry1, color, box.x + box.width - trr, ry1, color, rx, ry2, color, 0.f);
-        C2D_DrawTriangle(box.x + box.width - brr, ry2, color, box.x + box.width - trr, ry1, color, rx, ry2, color, 0.f);
-        C2D_DrawTriangle(bx1, by, color, bx1, box.y + box.height - blr, color, bx2, by, color, 0.f);
-        C2D_DrawTriangle(bx2, box.y + box.height - brr, color, bx1, box.y + box.height - blr, color, bx2, by, color, 0.f);
-
-        C2D_DrawTriangle(tx2, ry1, color, tx1, ly1, color, bx2, ry2, color, 0.f);
-        C2D_DrawTriangle(bx1, ly2, color, tx1, ly1, color, bx2, ry2, color, 0.f);
-
-        Clay3DSi__FillArc(box.x + tlr, box.y + tlr, tlr, 180.f, 270.f, color);
-        Clay3DSi__FillArc(box.x + box.width - trr, box.y + trr, trr, 270.f, 360.f, color);
-        Clay3DSi__FillArc(box.x + blr, box.y + box.height - blr, blr, 90.f, 180.f, color);
-        Clay3DSi__FillArc(box.x + box.width - brr, box.y + box.height - brr, brr, 0.f, 90.f, color);
+        Clay3DSi__FillArc(box.x + tlr, box.y + tlr, tlr, 180.f, 270.f, color);                       // Top Left
+        Clay3DSi__FillArc(box.x + box.width - trr, box.y + trr, trr, 270.f, 360.f, color);           // Top Right
+        Clay3DSi__FillArc(box.x + box.width - brr, box.y + box.height - brr, brr, 0.f, 90.f, color); // Bottom Right
+        Clay3DSi__FillArc(box.x + blr, box.y + box.height - blr, blr, 90.f, 180.f, color);           // Bottom Left
       }
 
       break;
