@@ -6,6 +6,7 @@
 # file that was distributed with this source code.
 
 cmake_minimum_required(VERSION 3.14)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(clay3ds
   VERSION 1.0.0 
