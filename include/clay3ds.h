@@ -45,8 +45,8 @@ static void Clay3DSi__DrawArc(float cx, float cy, float radius, float angs, floa
 
   float xInner1 = cx + innerRadius * cosAngle1;
   float yInner1 = cy + innerRadius * sinAngle1;
-  float xOuter1 = cx + outerRadius *cosAngle1;
-  float yOuter1 = cy + outerRadius *sinAngle1;
+  float xOuter1 = cx + outerRadius * cosAngle1;
+  float yOuter1 = cy + outerRadius * sinAngle1;
 
   for (u32 i = 1; i <= segments; ++i)
   {
@@ -54,8 +54,8 @@ static void Clay3DSi__DrawArc(float cx, float cy, float radius, float angs, floa
     float sinAngle2 = sinAngle1 * cosStep + cosAngle1 * sinStep;
     float xInner2 = cx + innerRadius * cosAngle2;
     float yInner2 = cy + innerRadius * sinAngle2;
-    float xOuter2 = cx + outerRadius *cosAngle2;
-    float yOuter2 = cy + outerRadius *sinAngle2;
+    float xOuter2 = cx + outerRadius * cosAngle2;
+    float yOuter2 = cy + outerRadius * sinAngle2;
 
     Clay3DSi__FillQuad(xInner1, yInner1, xInner2, yInner2, xOuter2, yOuter2, xOuter1, yOuter1, color);
 
