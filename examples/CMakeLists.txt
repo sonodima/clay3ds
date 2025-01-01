@@ -1,6 +1,6 @@
 # This file is part of the Clay3DS project.
 #
-# (c) 2024 Tommaso Dimatore
+# (c) 2025 Tommaso Dimatore
 #
 # For the full copyright and license information, please view the LICENSE
 # file that was distributed with this source code.
