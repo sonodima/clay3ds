@@ -19,8 +19,12 @@
 
 #include "clay.h"
 
+// Maximum number of glyphs drawable with each single text draw call.
+#define Clay3DSi__MAX_TEXT_SIZE 4096
+
 #define Clay3DSi__CLAY_COLOR_TO_C2D(cc) C2D_Color32((u8)cc.r, (u8)cc.g, (u8)cc.b, (u8)cc.a)
 #define Clay3DSi__DEG_TO_RAD(value) ((value) * (M_PI / 180.f))
+#define Clay3DSi__MIN(a, b) ((a) < (b) ? (a) : (b))
 #define Clay3DSi__GET_TEXT_SCALE(fs) ((float)(fs) / 30.f)
 
 static void Clay3DSi__FillQuad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, u32 color)
@@ -99,25 +103,38 @@ static void Clay3DSi__FillArc(float cx, float cy, float radius, float angs, floa
   }
 }
 
+static char Clay3DSi__cvTextBuffer[Clay3DSi__MAX_TEXT_SIZE];
+static C2D_TextBuf Clay3DSi__GetStaticTextBuffer(void)
+{
+  static C2D_TextBuf buffer = NULL;
+
+  if (buffer == NULL)
+  {
+    buffer = C2D_TextBufNew(Clay3DSi__MAX_TEXT_SIZE);
+  }
+  else
+  {
+    C2D_TextBufClear(buffer);
+  }
+
+  return buffer;
+}
+
 static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElementConfig* config)
 {
   float scale = Clay3DSi__GET_TEXT_SCALE(config->fontSize);
 
-  // TODO: re-use the same buffer for performance.
-  char* cloned = (char*)malloc(string->length + 1);
-  memcpy(cloned, string->chars, string->length);
-  cloned[string->length] = '\0';
+  u32 length = Clay3DSi__MIN(string->length, Clay3DSi__MAX_TEXT_SIZE);
+  memcpy(Clay3DSi__cvTextBuffer, string->chars, length);
+  Clay3DSi__cvTextBuffer[length] = '\0';
 
   C2D_Text text;
-  C2D_TextBuf buffer = C2D_TextBufNew(string->length + 1);
-  C2D_TextParse(&text, buffer, cloned);
+  C2D_TextBuf buffer = Clay3DSi__GetStaticTextBuffer();
+  C2D_TextParse(&text, buffer, Clay3DSi__cvTextBuffer);
   C2D_TextOptimize(&text);
 
   Clay_Dimensions dimensions;
   C2D_TextGetDimensions(&text, scale, scale, &dimensions.width, &dimensions.height);
-
-  C2D_TextBufDelete(buffer);
-  free(cloned);
   return dimensions;
 }
 
@@ -146,11 +163,11 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
       else
       {
         // Make sure that the rounding is not bigger than half of any side.
-        float max = fminf(box.width, box.height) / 2.f;
-        tlr = fminf(tlr, max);
-        trr = fminf(trr, max);
-        brr = fminf(brr, max);
-        blr = fminf(blr, max);
+        float max = Clay3DSi__MIN(box.width, box.height) / 2.f;
+        tlr = Clay3DSi__MIN(tlr, max);
+        trr = Clay3DSi__MIN(trr, max);
+        brr = Clay3DSi__MIN(brr, max);
+        blr = Clay3DSi__MIN(blr, max);
 
         // clang-format off
         Clay3DSi__FillQuad(box.x + tlr, box.y,
@@ -199,11 +216,11 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
       float rw = config->right.width;
       float bw = config->bottom.width;
       // Make sure that the rounding is not bigger than half of any side.
-      float max = fminf(box.width, box.height) / 2.f;
-      float tlr = fminf(config->cornerRadius.topLeft, max);
-      float trr = fminf(config->cornerRadius.topRight, max);
-      float brr = fminf(config->cornerRadius.bottomRight, max);
-      float blr = fminf(config->cornerRadius.bottomLeft, max);
+      float max = Clay3DSi__MIN(box.width, box.height) / 2.f;
+      float tlr = Clay3DSi__MIN(config->cornerRadius.topLeft, max);
+      float trr = Clay3DSi__MIN(config->cornerRadius.topRight, max);
+      float brr = Clay3DSi__MIN(config->cornerRadius.bottomRight, max);
+      float blr = Clay3DSi__MIN(config->cornerRadius.bottomLeft, max);
 
       if (config->top.width > 0.f)
       {
@@ -246,20 +263,15 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
       u32 color = Clay3DSi__CLAY_COLOR_TO_C2D(config->textColor);
 
       Clay_String string = renderCommand->text;
-      // TODO: re-use the same buffer for performance.
-      char* cloned = (char*)malloc(string.length + 1);
-      memcpy(cloned, string.chars, string.length);
-      cloned[string.length] = '\0';
+      u32 length = Clay3DSi__MIN(string.length, Clay3DSi__MAX_TEXT_SIZE);
+      memcpy(Clay3DSi__cvTextBuffer, string.chars, length);
+      Clay3DSi__cvTextBuffer[length] = '\0';
 
       C2D_Text text;
-      // TODO: re-use the same buffer for performance.
-      C2D_TextBuf buffer = C2D_TextBufNew(string.length + 1);
-      C2D_TextParse(&text, buffer, cloned);
+      C2D_TextBuf buffer = Clay3DSi__GetStaticTextBuffer();
+      C2D_TextParse(&text, buffer, Clay3DSi__cvTextBuffer);
       C2D_TextOptimize(&text);
       C2D_DrawText(&text, C2D_WithColor, box.x, box.y, 0.f, scale, scale, color);
-
-      C2D_TextBufDelete(buffer);
-      free(cloned);
       break;
     }
     case CLAY_RENDER_COMMAND_TYPE_IMAGE: {
