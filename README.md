@@ -23,25 +23,35 @@ You can also use CMake FetchContent if you feel fancy.
 
 **LOOK AT THE [EXAMPLES](examples)**
 
-## System Environment
+## Running the Examples
 
-You will need to install [devkitPro](https://devkitpro.org/wiki/Getting_Started) on your system, and install the `3ds-dev` group with the following command:
+The easiest way to build the examples is to use [Docker](https://www.docker.com) and the provided `Dockerfile`.
+
+### Docker Builds
+
+Install Docker on your system, and then execute the following command in this directory:
+
+```sh
+docker build --rm -t clay3ds --output type=tar,dest=artifacts.tar .
+```
+
+After the build is finished, a file named `artifacts.tar`, containing all the executables, will be created.
+
+### Manual Builds
+
+If you want to compile the examples manually, you will need to install `git`, `cmake` and [devkitPro](https://devkitpro.org/wiki/Getting_Started) on your system, and install the `3ds-dev` group using the following commands:
 
 ```sh
 dkp-pacman -S 3ds-dev
 ```
 
-Depending on what you want to do, you may also need to install `cmake` on your system.
-
-## Running the Examples
-
-After you have set up your environment, you can use the following commands to build all the examples.
+---
 
 ```sh
-# Configure the project using the devkitPro cmake wrapper:
+# Use the CMake wrapper provided by devkitPro to configure the project.
 /opt/devkitpro/portlibs/3ds/bin/arm-none-eabi-cmake -S . -DCLAY3DS_BUILD_EXAMPLES=true -B build
 
-# Compile the program in release mode:
+# Compile the project in release mode.
 cmake -B build -C Release
 ```
 
