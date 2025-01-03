@@ -140,6 +140,10 @@ static C2D_Font Clay3DSi__GetFont(s32 id)
   return Clay3DSi__fontList[id - 1];
 }
 
+// Registers the specified custom font for use in text rendering.
+//
+// @return The font identifier if successful, or Clay3DS_FONT_INVALID if the maximum
+//         number of registered fonts has been reached.
 static s32 Clay3DS_RegisterFont(C2D_Font font)
 {
   if (Clay3DSi__numFonts >= Clay3DSi__MAX_FONTS)
@@ -151,6 +155,7 @@ static s32 Clay3DS_RegisterFont(C2D_Font font)
   return Clay3DS_FONT_SYSTEM + Clay3DSi__numFonts;
 }
 
+// Measures the dimensions of the specified text string based on the provided configuration.
 static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElementConfig* config)
 {
   float scale = Clay3DSi__GET_TEXT_SCALE(config->fontSize);
@@ -170,6 +175,9 @@ static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElement
   return dimensions;
 }
 
+// Renders the specified render commands to the given render target.
+//
+// This function should be executed in a loop, after C2D_SceneBegin has been called.
 static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimensions, Clay_RenderCommandArray renderCommands)
 {
   for (u32 i = 0; i < renderCommands.length; i++)
@@ -319,8 +327,13 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
     }
     case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START: {
       C2D_SceneBegin(renderTarget);
-      C3D_SetScissor(GPU_SCISSOR_NORMAL, dimensions.height - box.height - box.y, dimensions.width - box.width - box.x, box.height + box.y,
+      // clang-format off
+      C3D_SetScissor(GPU_SCISSOR_NORMAL,
+                     dimensions.height - box.height - box.y,
+                     dimensions.width - box.width - box.x,
+                     box.height + box.y,
                      dimensions.width - box.x);
+      // clang-format on
       break;
     }
     case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END: {
