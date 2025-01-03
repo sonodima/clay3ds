@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(clay3ds
-  VERSION 1.0.0 
+  VERSION 1.1.0 
   DESCRIPTION "Single-header Clay renderer for the 3DS using Citro2D"
   HOMEPAGE_URL "https://github.com/sonodima/clay3ds"
   LANGUAGES C)
