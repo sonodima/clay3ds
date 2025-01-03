@@ -36,7 +36,9 @@ Clay_RenderCommandArray renderLayout(void)
         CLAY_STRING("this font is for boys"),
         CLAY_TEXT_CONFIG({
           .textColor = (Clay_Color){255, 40, 40, 255},
-          .fontSize = 24
+          .fontSize = 24,
+          // You can omit this, but it's here for clarity.
+          .fontId = Clay3DS_FONT_SYSTEM
         })
       )
     ) {}
