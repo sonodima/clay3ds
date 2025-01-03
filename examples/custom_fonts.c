@@ -265,7 +265,7 @@ const unsigned int CUSTOM_FONT_DATA[10732 / 4] = {
     0x000029d4, 0x00000002, 0x50414d43, 0x00000020, 0xffff0000, 0x00000002, 0x00000000, 0x00000002, 0x000d0000, 0x00000001,
 };
 
-static u16 customFontId;
+static s32 customFontId = Clay3DS_FONT_INVALID;
 
 Clay_RenderCommandArray renderLayout(void)
 {
@@ -280,6 +280,7 @@ Clay_RenderCommandArray renderLayout(void)
     })
   ) {
     CLAY(
+      CLAY_ID("SYSTEM_TEXT"),
       CLAY_TEXT(
         CLAY_STRING("this is a text rendered with the system font"),
         CLAY_TEXT_CONFIG({
@@ -290,6 +291,7 @@ Clay_RenderCommandArray renderLayout(void)
     ) {}
 
     CLAY(
+      CLAY_ID("CUSTOM_TEXT"),
       CLAY_TEXT(
         CLAY_STRING("this is a text rendered with a custom font"),
         CLAY_TEXT_CONFIG({
@@ -324,9 +326,20 @@ int main(void)
   C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
   C2D_Prepare();
 
+  consoleInit(GFX_TOP, NULL);
   C3D_RenderTarget* bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+
+  // Load the custom font from memory, and then register it in the Clay renderer.
   C2D_Font font = C2D_FontLoadFromMem(CUSTOM_FONT_DATA, CUSTOM_FONT_SIZE);
   customFontId = Clay3DS_RegisterFont(font);
+  if (customFontId == Clay3DS_FONT_INVALID)
+  {
+    printf("failed to register the created font :(");
+  }
+  else
+  {
+    printf("registered the custom font at id=%d", customFontId);
+  }
 
   u32 clearColor = C2D_Color32(0, 0, 0, 255);
 

@@ -25,9 +25,15 @@
 #define Clay3DSi__MAX_FONTS 8
 
 #define Clay3DSi__CLAY_COLOR_TO_C2D(cc) C2D_Color32((u8)cc.r, (u8)cc.g, (u8)cc.b, (u8)cc.a)
+#define Clay3DSi__GET_TEXT_SCALE(fs) ((float)(fs) / 30.f)
 #define Clay3DSi__DEG_TO_RAD(value) ((value) * (M_PI / 180.f))
 #define Clay3DSi__MIN(a, b) ((a) < (b) ? (a) : (b))
-#define Clay3DSi__GET_TEXT_SCALE(fs) ((float)(fs) / 30.f)
+
+enum
+{
+  Clay3DS_FONT_INVALID = -1,
+  Clay3DS_FONT_SYSTEM = 0,
+};
 
 static void Clay3DSi__FillQuad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, u32 color)
 {
@@ -124,28 +130,25 @@ static C2D_TextBuf Clay3DSi__GetStaticTextBuffer(void)
 
 static C2D_Font Clay3DSi__fontList[Clay3DSi__MAX_FONTS];
 static u16 Clay3DSi__numFonts = 0;
-static s32 Clay3DS_RegisterFont(C2D_Font font)
+static C2D_Font Clay3DSi__GetFont(s32 id)
 {
-  if (Clay3DSi__numFonts >= Clay3DSi__MAX_FONTS)
-  {
-    return -1;
-  }
-
-  Clay3DSi__fontList[Clay3DSi__numFonts++] = font;
-  // NOTE: we return the incremented index because at id 0 we always keep
-  //       the system font.
-  return Clay3DSi__numFonts;
-}
-
-static C2D_Font Clay3DSi__GetFont(u16 id)
-{
-  // NOTE: id 0 is always the system font.
-  if (id == 0 || id > Clay3DSi__numFonts)
+  if (id <= Clay3DS_FONT_SYSTEM || id > Clay3DSi__numFonts)
   {
     return NULL;
   }
 
   return Clay3DSi__fontList[id - 1];
+}
+
+static s32 Clay3DS_RegisterFont(C2D_Font font)
+{
+  if (Clay3DSi__numFonts >= Clay3DSi__MAX_FONTS)
+  {
+    return Clay3DS_FONT_INVALID;
+  }
+
+  Clay3DSi__fontList[Clay3DSi__numFonts++] = font;
+  return Clay3DS_FONT_SYSTEM + Clay3DSi__numFonts;
 }
 
 static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElementConfig* config)
