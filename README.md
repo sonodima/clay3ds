@@ -2,16 +2,7 @@
 
 Clay3DS is a library that makes it easy to use the [Clay](https://github.com/nicbarker/clay) library on the Nintendo 3DS.
 
-## Feature Support
-
-- [x] **Rectangles** • Fully implemented *(including rounded corners)*
-- [x] **Borders** • Fully implemented *(including rounded corners)*
-- [x] **Scissoring** • Implemented and working correctly
-- [x] **Text** • Supported, rendering with the default system font
-- [x] **Dual Screens** • Supported, as long as you don't put interactable items on the top screen *(which would not make sense anyway)*
-- [x] **Touch Screen** • Implemented and working correctly *(including drag scroll)*
-- [x] **Transparency** • Implemented and working correctly
-- [x] **Images** • Implemented _(but untested)_
+It provides a fully featured 2D renderer with basic shapes, rounded corners, and text rendering with custom font support.
 
 ## Installation
 
