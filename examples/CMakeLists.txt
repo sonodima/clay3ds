@@ -41,5 +41,6 @@ function(add_sample FILE)
   ctr_create_3dsx(clay3dse_${FILE} SMDH "${FILE}.smdh")
 endfunction()
 
+add_sample(custom_fonts)
 add_sample(minimal)
 add_sample(two_screens)

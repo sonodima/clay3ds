@@ -21,6 +21,8 @@
 
 // Maximum number of glyphs drawable with each single text draw call.
 #define Clay3DSi__MAX_TEXT_SIZE 4096
+// Maximum number of extra fonts that can be loaded at the same time.
+#define Clay3DSi__MAX_FONTS 8
 
 #define Clay3DSi__CLAY_COLOR_TO_C2D(cc) C2D_Color32((u8)cc.r, (u8)cc.g, (u8)cc.b, (u8)cc.a)
 #define Clay3DSi__DEG_TO_RAD(value) ((value) * (M_PI / 180.f))
@@ -120,6 +122,32 @@ static C2D_TextBuf Clay3DSi__GetStaticTextBuffer(void)
   return buffer;
 }
 
+static C2D_Font Clay3DSi__fontList[Clay3DSi__MAX_FONTS];
+static u16 Clay3DSi__numFonts = 0;
+static s32 Clay3DS_RegisterFont(C2D_Font font)
+{
+  if (Clay3DSi__numFonts >= Clay3DSi__MAX_FONTS)
+  {
+    return -1;
+  }
+
+  Clay3DSi__fontList[Clay3DSi__numFonts++] = font;
+  // NOTE: we return the incremented index because at id 0 we always keep
+  //       the system font.
+  return Clay3DSi__numFonts;
+}
+
+static C2D_Font Clay3DSi__GetFont(u16 id)
+{
+  // NOTE: id 0 is always the system font.
+  if (id == 0 || id > Clay3DSi__numFonts)
+  {
+    return NULL;
+  }
+
+  return Clay3DSi__fontList[id - 1];
+}
+
 static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElementConfig* config)
 {
   float scale = Clay3DSi__GET_TEXT_SCALE(config->fontSize);
@@ -130,7 +158,8 @@ static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElement
 
   C2D_Text text;
   C2D_TextBuf buffer = Clay3DSi__GetStaticTextBuffer();
-  C2D_TextParse(&text, buffer, Clay3DSi__cvTextBuffer);
+  C2D_Font font = Clay3DSi__GetFont(config->fontId);
+  C2D_TextFontParse(&text, font, buffer, Clay3DSi__cvTextBuffer);
   C2D_TextOptimize(&text);
 
   Clay_Dimensions dimensions;
@@ -269,7 +298,8 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
 
       C2D_Text text;
       C2D_TextBuf buffer = Clay3DSi__GetStaticTextBuffer();
-      C2D_TextParse(&text, buffer, Clay3DSi__cvTextBuffer);
+      C2D_Font font = Clay3DSi__GetFont(config->fontId);
+      C2D_TextFontParse(&text, font, buffer, Clay3DSi__cvTextBuffer);
       C2D_TextOptimize(&text);
       C2D_DrawText(&text, C2D_WithColor, box.x, box.y, 0.f, scale, scale, color);
       break;
