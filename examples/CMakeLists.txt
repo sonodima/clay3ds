@@ -29,18 +29,30 @@ endif()
 # Examples Definitions
 # ================================
 
-function(add_sample FILE)
-  add_executable(clay3dse_${FILE})
-  target_sources(clay3dse_${FILE} PRIVATE "${FILE}.c")
-  target_compile_features(clay3dse_${FILE} INTERFACE c_std_99)
-  target_include_directories(clay3dse_${FILE} PRIVATE "${clay_SOURCE_DIR}")
-  target_link_libraries(clay3dse_${FILE} PRIVATE citro2d citro3d clay3ds)
+function(add_sample SAMPLE_NAME)
+  set(SAMPLE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME}")
 
-  set_target_properties(clay3dse_${FILE} PROPERTIES OUTPUT_NAME "${FILE}")
-  ctr_generate_smdh("${FILE}.smdh" NAME "Clay3DS Example")
-  ctr_create_3dsx(clay3dse_${FILE} SMDH "${FILE}.smdh")
+  # Automatically find all the sources in the sample's directory.
+  file(GLOB SOURCES CONFIGURE_DEPENDS "${SAMPLE_DIR}/*.c" "${SAMPLE_DIR}/*.h")
+
+  add_executable(clay3dse_${SAMPLE_NAME})
+  target_sources(clay3dse_${SAMPLE_NAME} PRIVATE "${SOURCES}")
+  target_compile_features(clay3dse_${SAMPLE_NAME} INTERFACE c_std_99)
+  target_include_directories(clay3dse_${SAMPLE_NAME} PRIVATE "${clay_SOURCE_DIR}")
+  target_link_libraries(clay3dse_${SAMPLE_NAME} PRIVATE citro2d citro3d clay3ds)
+  set_target_properties(clay3dse_${SAMPLE_NAME} PROPERTIES OUTPUT_NAME "${SAMPLE_NAME}")
+
+  # Only set the path to ROMFS if the example actually makes use of it.
+  set(ROMFS_PATH "${SAMPLE_DIR}/romfs")
+  IF(NOT IS_DIRECTORY "${ROMFS_PATH}")
+    set(ROMFS_PATH "")
+  endif()
+
+  set(SMDH_PATH "${SAMPLE_NAME}.smdh")
+  ctr_generate_smdh("${SMDH_PATH}" NAME "Clay3DS Example")
+  ctr_create_3dsx(clay3dse_${SAMPLE_NAME} SMDH "${SMDH_PATH}" ROMFS "${ROMFS_PATH}")
 endfunction()
 
 add_sample(custom_fonts)
+add_sample(dual_screen)
 add_sample(minimal)
-add_sample(two_screens)
