@@ -16,7 +16,7 @@
 #include <clay.h>
 #include <clay3ds.h>
 
-static s32 customFontId = Clay3DS_FONT_INVALID;
+static s32 comicSansId = Clay3DS_FONT_INVALID;
 
 Clay_RenderCommandArray renderLayout(void)
 {
@@ -33,10 +33,10 @@ Clay_RenderCommandArray renderLayout(void)
     CLAY(
       CLAY_ID("SYSTEM_TEXT"),
       CLAY_TEXT(
-        CLAY_STRING("this is a text rendered with the system font"),
+        CLAY_STRING("this font is for boys"),
         CLAY_TEXT_CONFIG({
-          .textColor = (Clay_Color){255, 255, 255, 255},
-          .fontSize = 15
+          .textColor = (Clay_Color){255, 40, 40, 255},
+          .fontSize = 24
         })
       )
     ) {}
@@ -44,11 +44,11 @@ Clay_RenderCommandArray renderLayout(void)
     CLAY(
       CLAY_ID("CUSTOM_TEXT"),
       CLAY_TEXT(
-        CLAY_STRING("this is a text rendered with a custom font"),
+        CLAY_STRING("but this... this font is for men"),
         CLAY_TEXT_CONFIG({
-          .textColor = (Clay_Color){255, 255, 255, 255},
-          .fontSize = 15,
-          .fontId = customFontId
+          .textColor = (Clay_Color){40, 255, 40, 255},
+          .fontSize = 24,
+          .fontId = comicSansId
         })
       )
     ) {}
@@ -84,15 +84,21 @@ int main(void)
   C3D_RenderTarget* bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 
   // Load the custom font from romfs, and then register it in the Clay renderer.
-  C2D_Font font = C2D_FontLoad("romfs:/galmuri.bcfnt");
-  customFontId = Clay3DS_RegisterFont(font);
-  if (customFontId == Clay3DS_FONT_INVALID)
+  //
+  // You can create a BCFNT using a certain Font Converter tool provided in the CTR SDK.
+  // Unfortunately, this SDK is proprietary and absolutely not available to anyone who is
+  // not granted access by Nintendo.
+  //
+  // Don't even bother looking it up on [myrient.erista.me], you will not find it.
+  C2D_Font font = C2D_FontLoad("romfs:/comic-sans.bcfnt");
+  comicSansId = Clay3DS_RegisterFont(font);
+  if (comicSansId == Clay3DS_FONT_INVALID)
   {
     printf("failed to register the created font :(");
   }
   else
   {
-    printf("registered the custom font at id=%d", customFontId);
+    printf("registered the custom font at id=%d", comicSansId);
   }
 
   u32 clearColor = C2D_Color32(0, 0, 0, 255);

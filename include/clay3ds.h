@@ -25,7 +25,7 @@
 #define Clay3DSi__MAX_FONTS 8
 
 #define Clay3DSi__CLAY_COLOR_TO_C2D(cc) C2D_Color32((u8)cc.r, (u8)cc.g, (u8)cc.b, (u8)cc.a)
-#define Clay3DSi__GET_TEXT_SCALE(fs) ((float)(fs) / 30.f)
+#define Clay3DSi__CALC_FONT_SCALE(size) ((float)(size) / 30.f)
 #define Clay3DSi__DEG_TO_RAD(value) ((value) * (M_PI / 180.f))
 #define Clay3DSi__MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -146,7 +146,7 @@ static C2D_Font Clay3DSi__GetFont(s32 id)
 //         number of registered fonts has been reached.
 static s32 Clay3DS_RegisterFont(C2D_Font font)
 {
-  if (Clay3DSi__numFonts >= Clay3DSi__MAX_FONTS)
+  if (font == NULL || Clay3DSi__numFonts >= Clay3DSi__MAX_FONTS)
   {
     return Clay3DS_FONT_INVALID;
   }
@@ -158,15 +158,15 @@ static s32 Clay3DS_RegisterFont(C2D_Font font)
 // Measures the dimensions of the specified text string based on the provided configuration.
 static Clay_Dimensions Clay3DS_MeasureText(Clay_String* string, Clay_TextElementConfig* config)
 {
-  float scale = Clay3DSi__GET_TEXT_SCALE(config->fontSize);
-
   u32 length = Clay3DSi__MIN(string->length, Clay3DSi__MAX_TEXT_SIZE);
   memcpy(Clay3DSi__cvTextBuffer, string->chars, length);
   Clay3DSi__cvTextBuffer[length] = '\0';
 
+  C2D_Font font = Clay3DSi__GetFont(config->fontId);
+  float scale = Clay3DSi__CALC_FONT_SCALE(config->fontSize);
+
   C2D_Text text;
   C2D_TextBuf buffer = Clay3DSi__GetStaticTextBuffer();
-  C2D_Font font = Clay3DSi__GetFont(config->fontId);
   C2D_TextFontParse(&text, font, buffer, Clay3DSi__cvTextBuffer);
   C2D_TextOptimize(&text);
 
@@ -299,7 +299,6 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
     }
     case CLAY_RENDER_COMMAND_TYPE_TEXT: {
       Clay_TextElementConfig* config = renderCommand->config.textElementConfig;
-      float scale = Clay3DSi__GET_TEXT_SCALE(config->fontSize);
       u32 color = Clay3DSi__CLAY_COLOR_TO_C2D(config->textColor);
 
       Clay_String string = renderCommand->text;
@@ -307,9 +306,11 @@ static void Clay3DS_Render(C3D_RenderTarget* renderTarget, Clay_Dimensions dimen
       memcpy(Clay3DSi__cvTextBuffer, string.chars, length);
       Clay3DSi__cvTextBuffer[length] = '\0';
 
+      C2D_Font font = Clay3DSi__GetFont(config->fontId);
+      float scale = Clay3DSi__CALC_FONT_SCALE(config->fontSize);
+
       C2D_Text text;
       C2D_TextBuf buffer = Clay3DSi__GetStaticTextBuffer();
-      C2D_Font font = Clay3DSi__GetFont(config->fontId);
       C2D_TextFontParse(&text, font, buffer, Clay3DSi__cvTextBuffer);
       C2D_TextOptimize(&text);
       C2D_DrawText(&text, C2D_WithColor, box.x, box.y, 0.f, scale, scale, color);
